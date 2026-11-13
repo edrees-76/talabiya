@@ -1,5 +1,7 @@
 # طلبية — Talabiya
 
+[![tests](https://github.com/edrees-76/talabiya/actions/workflows/tests.yml/badge.svg)](https://github.com/edrees-76/talabiya/actions/workflows/tests.yml)
+
 برنامج سطح مكتب (Windows، عربي، يعمل بلا إنترنت) لتسجيل مشتريات المطاعم اليومية والعهدة النقدية،
 بديلاً عن ملف الإكسل اليومي.
 
@@ -14,6 +16,7 @@ python -m talabiya
 ```bash
 python -m pytest tests -q
 ```
+تعمل الاختبارات تلقائياً على GitHub (Windows، Python 3.12 و3.14) مع كل رفع.
 
 ## بيانات تجريبية ولقطات الشاشات
 ```bash
