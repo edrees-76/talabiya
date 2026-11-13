@@ -32,13 +32,20 @@ class ClosePage(Page):
         self.host = QVBoxLayout()
         self.body.addLayout(self.host)
         self.body.addStretch(1)
+        self.actual: W.MoneyEdit | None = None   # the form exists only while restaurants exist
+        self.notes: QPlainTextEdit | None = None
+        self.loaded_day: str | None = None       # the day the form fields belong to
 
     def refresh(self) -> None:
+        self._keep_draft()                       # before the fields are destroyed or the day changes
         W.clear_layout(self.host)
+        self.actual = self.notes = None
+        self.loaded_day = None
         if not self.repo.restaurants(include_inactive=True):
             self.host.addWidget(empty_state(self))
             return
         day = self.state.day_iso
+        self.loaded_day = day
         rows = close_rows(self.repo, day)
         self.totals = ledger.day_totals([s for _, s in rows])
         self.dc = self.repo.day_close(day)
@@ -149,10 +156,10 @@ class ClosePage(Page):
             W.set_role(self.diff_val, {"surface_fresh": "bigOk", "surface_alert": "bigBad"}.get(kind, "big"))
 
     def _save_draft(self) -> None:
-        if not hasattr(self, "actual"):
+        if self.actual is None or self.notes is None or self.loaded_day is None:
             return
         txt = self.actual.text().strip()
-        dc = self.repo.day_close(self.state.day_iso)
+        dc = self.repo.day_close(self.loaded_day)
         dc.actual_cash = self.actual.value() if txt else None
         dc.notes = self.notes.toPlainText().strip()
         self.repo.save_day_close(dc)
@@ -173,9 +180,15 @@ class ClosePage(Page):
             self.state.dataChanged.emit()
             self.refresh()
 
-    def leave(self) -> bool:
-        if hasattr(self, "actual") and not self.repo.day_close(self.state.day_iso).closed:
+    def _keep_draft(self) -> None:
+        """Save what was typed for an open (not closed) day; a closed day changes only via «حفظ التعديل»."""
+        if self.loaded_day is not None and not self.repo.day_close(self.loaded_day).closed:
             self._save_draft()
+
+    def leave(self) -> bool:
+        self._keep_draft()
+        # The fields are now saved; other pages may change or delete that day, so never write them again.
+        self.loaded_day = None
         return True
 
     def _html(self) -> str:

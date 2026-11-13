@@ -193,6 +193,9 @@ def logo(name: str, width: int) -> QLabel:
 
 
 # --------------------------------------------------------------- number fields
+MAX_INT_DIGITS = 7   # up to 9,999,999.999 — qty x price then stays far inside SQLite's 64-bit integers
+
+
 class NumberEdit(QLineEdit):
     """Latin-digit decimal field (left-to-right) with up to ``decimals`` places."""
 
@@ -204,7 +207,7 @@ class NumberEdit(QLineEdit):
         self.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.setPlaceholderText(placeholder)
-        rx = QRegularExpression(rf"^\d{{0,9}}([.,]\d{{0,{decimals}}})?$")
+        rx = QRegularExpression(rf"^\d{{0,{MAX_INT_DIGITS}}}([.,]\d{{0,{decimals}}})?$")
         self.setValidator(QRegularExpressionValidator(rx, self))
         self.textEdited.connect(lambda _t: self.valueChanged.emit())
         self.setInputMethodHints(Qt.InputMethodHint.ImhFormattedNumbersOnly)

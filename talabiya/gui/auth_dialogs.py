@@ -1,6 +1,8 @@
 """First-run setup, login and password recovery."""
 from __future__ import annotations
 
+import math
+import time
 from pathlib import Path
 
 from PySide6.QtCore import QStandardPaths, Qt, QTimer
@@ -229,6 +231,7 @@ class LoginDialog(QDialog):
         super().__init__()
         self.repo = repo
         self.fails = 0
+        self.locked_until = 0.0   # time.monotonic() before which no attempt is checked
         self.setWindowTitle("تسجيل الدخول")
         self.setFixedWidth(420)
         lay = QVBoxLayout(self)
@@ -251,6 +254,10 @@ class LoginDialog(QDialog):
         lay.addWidget(forgot, 0, Qt.AlignmentFlag.AlignCenter)
 
     def _login(self) -> None:
+        left = self.locked_until - time.monotonic()
+        if left > 0:
+            self.err.setText(f"انتظر {math.ceil(left)} ثانية ثم حاول")
+            return
         if auth.check_password(self.repo, self.pw.text()):
             self.accept()
             return
@@ -259,6 +266,7 @@ class LoginDialog(QDialog):
         self.err.setText("كلمة السر غير صحيحة. حاول مرة أخرى")
         if self.fails >= 3:
             wait = min(30, 2 * (self.fails - 2))
+            self.locked_until = time.monotonic() + wait
             self.ok.setEnabled(False)
             self.err.setText(f"كلمة السر غير صحيحة. انتظر {wait} ثانية ثم حاول")
             QTimer.singleShot(wait * 1000, lambda: (self.ok.setEnabled(True), self.err.setText("")))

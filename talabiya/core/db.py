@@ -94,21 +94,54 @@ def migrate(conn: sqlite3.Connection) -> None:
     if version > SCHEMA_VERSION:
         raise RuntimeError("قاعدة البيانات من إصدار أحدث من البرنامج. حدّث البرنامج أولاً.")
     for i in range(version, SCHEMA_VERSION):
-        with conn:
-            conn.executescript(MIGRATIONS[i])
-            conn.execute(f"PRAGMA user_version = {i + 1}")
+        # One explicit transaction per step: the tables and the new user_version land together or not at all.
+        try:
+            conn.executescript(f"BEGIN;\n{MIGRATIONS[i]}\nPRAGMA user_version = {i + 1};\nCOMMIT;")
+        except sqlite3.Error:
+            if conn.in_transaction:
+                conn.execute("ROLLBACK")
+            raise
 
 
-def is_talabiya_db(path: str | os.PathLike[str]) -> bool:
-    """True when ``path`` is a readable SQLite file with this program's tables."""
+def _required_columns() -> dict[str, set[str]]:
+    """Columns of every table in the current schema, read from a scratch in-memory database."""
+    mem = sqlite3.connect(":memory:")
+    try:
+        for script in MIGRATIONS:
+            mem.executescript(script)
+        return {t: {r[1] for r in mem.execute(f"PRAGMA table_info({t})")} for t in REQUIRED_TABLES}
+    finally:
+        mem.close()
+
+
+def check_db(path: str | os.PathLike[str]) -> str | None:
+    """None when ``path`` is a sound Talabiya database; otherwise the reason (Arabic) it is not."""
     try:
         uri = Path(path).resolve().as_uri() + "?mode=ro"
         conn = sqlite3.connect(uri, uri=True)
         try:
-            names = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             version = conn.execute("PRAGMA user_version").fetchone()[0]
+            if not 1 <= version <= SCHEMA_VERSION:
+                return "الملف ليس قاعدة بيانات طلبية أو أنه من إصدار أحدث من البرنامج"
+            want = _required_columns()
+            for table, cols in want.items():
+                have = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+                if not cols <= have:
+                    return "الملف ليس قاعدة بيانات طلبية (جداول أو أعمدة ناقصة)"
+            ok = conn.execute("PRAGMA integrity_check").fetchone()[0]
+            if ok != "ok":
+                return "الملف تالف ولا يصلح للاسترجاع"
+            if conn.execute("PRAGMA foreign_key_check").fetchone() is not None:
+                return "الملف فيه بيانات غير مترابطة ولا يصلح للاسترجاع"
+            for table in want:   # every row must actually be readable
+                conn.execute(f"SELECT * FROM {table}").fetchall()
         finally:
             conn.close()
     except sqlite3.Error:
-        return False
-    return REQUIRED_TABLES <= names and 1 <= version <= SCHEMA_VERSION
+        return "الملف تالف أو ليس قاعدة بيانات"
+    return None
+
+
+def is_talabiya_db(path: str | os.PathLike[str]) -> bool:
+    """True when ``path`` is a readable, intact SQLite file with this program's schema."""
+    return check_db(path) is None

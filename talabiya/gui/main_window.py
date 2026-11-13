@@ -115,8 +115,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
         state.navigate.connect(self.show_page)
         state.dayChanged.connect(self._refresh_current)
-        state.dataChanged.connect(self._mark_stale)
-        self._stale: set[str] = set()
 
     def show_page(self, key: str) -> None:
         if key == self.current:
@@ -129,14 +127,10 @@ class MainWindow(QMainWindow):
         self.nav_buttons[key].setChecked(True)
         self.stack.setCurrentIndex([k for k, *_ in NAV].index(key))
         self.pages[key].refresh()
-        self._stale.discard(key)
 
     def _refresh_current(self) -> None:
         if self.current:
             self.pages[self.current].refresh()
-
-    def _mark_stale(self) -> None:
-        self._stale = set(self.pages) - {self.current}
 
     def _logout(self) -> None:
         if self.current and not self.pages[self.current].leave():

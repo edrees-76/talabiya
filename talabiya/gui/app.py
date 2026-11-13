@@ -1,6 +1,7 @@
 """Program entry: setup or login, main window, theme switch, lock, restore, backups on start and exit."""
 from __future__ import annotations
 
+import sqlite3
 import sys
 import traceback
 from datetime import datetime
@@ -85,13 +86,20 @@ class Controller:
         if self.window:
             self.window.flush()
         self.conn.close()
+        failure: str | None = None
         try:
             backup.restore(source, self.db_path)
         except RepoError as e:
-            W.error(self.window, str(e))
-        finally:
-            self.conn = connect(self.db_path)
-            self.repo = Repo(self.conn)
+            failure = str(e)
+        except Exception as e:  # noqa: BLE001 - the database must be reopened whatever happened
+            failure = f"تعذر استرجاع النسخة: {e}"
+        # Always reopen and rebuild the window: every page holds the repo, and the old connection is closed.
+        self.conn = connect(self.db_path)
+        self.repo = Repo(self.conn)
+        if failure:
+            W.error(self.window, failure)
+            self._build("settings")
+            return
         W.info(self.window, "تم استرجاع النسخة. سيُطلب منك الدخول بكلمة سر تلك النسخة")
         if self.window:
             self.window.hide()
@@ -107,7 +115,7 @@ class Controller:
     def _backup_quietly(self) -> None:
         try:
             backup.run_if_due(self.repo)
-        except (RepoError, OSError) as e:
+        except (RepoError, OSError, sqlite3.Error) as e:
             W.error(None, f"تعذر أخذ النسخة الاحتياطية التلقائية: {e}\nاختر مجلداً آخر من الإعدادات.")
 
     def shutdown(self) -> None:

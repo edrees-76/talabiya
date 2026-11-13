@@ -11,6 +11,8 @@ from talabiya.core.models import DayClose, Item, Line, Restaurant, Sheet
 from talabiya.core.money import parse_qty, qty_text
 
 
+MAX_AMOUNT = 10**15   # milli-dinars (a trillion dinars): anything above is a typing mistake
+
 class RepoError(ValueError):
     """A user-facing refusal (message is Arabic and says what to do)."""
 
@@ -232,6 +234,11 @@ class Repo:
         An empty sheet that was never saved is not written; a saved sheet that became empty is deleted.
         """
         lines = [ln for ln in sheet.lines if not ln.is_blank]
+        amounts = [sheet.received, sheet.wage, sheet.entry_fee]
+        for ln in lines:
+            amounts += [ln.unit_price, ln.total]
+        if any(not 0 <= a <= MAX_AMOUNT for a in amounts):
+            raise RepoError("مبلغ غير منطقي (سالب أو كبير جداً). راجع الأرقام المدخلة")
         empty = not (sheet.received or sheet.wage or sheet.entry_fee or lines or sheet.notes.strip() or sheet.done)
         with self.conn:
             if empty:
