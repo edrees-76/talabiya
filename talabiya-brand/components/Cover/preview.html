@@ -1,0 +1,27 @@
+<!-- @dsCard height=300 -->
+<html lang="ar"><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@800&family=Tajawal:wght@400;500&display=swap">
+<style>
+html,body{margin:0;background:var(--surface)}
+svg{display:block;width:960px;height:300px}
+.brand{fill:var(--brand)}.leaf{fill:var(--green)}.coin{fill:var(--gold)}.tomato{fill:var(--tomato)}.strong{fill:var(--green-strong)}
+.lg{rx:var(--radius-lg)}
+.name{font:800 112px/1 var(--font-display);fill:var(--ink)}
+.tag{font:400 14px var(--font-body);fill:var(--ink-muted)}
+</style></head>
+<body>
+<svg viewBox="0 0 960 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="طلبية">
+<!-- blocks: brand slab 240x210 bleeding off the top, green disc r60, tomato disc r34, gold coin-stack of 3 pills 168x26 with 6px gaps, green-strong slab 144x140 bleeding off the bottom.
+     arrangement: one tall navy slab with satellites, everything right of x=480; name bottom-left on the ground, nothing crosses it.
+     pattern: soft, friendly, large radii plus a literal coin motif, so the coin stack is built from pills (radius-pill) and the leaf and tomato from discs.
+     steps and radii: slab corners radius-lg (22), pills radius-pill (half of 26), discs 60 and 34, gaps 16 and 8. -->
+<rect class="strong lg" x="800" y="188" width="144" height="140"/>
+<rect class="brand lg" x="504" y="-40" width="240" height="220"/>
+<circle class="leaf" cx="868" cy="92" r="60"/>
+<circle class="tomato" cx="776" cy="206" r="34"/>
+<rect class="coin" x="504" y="196" width="168" height="26" rx="13"/>
+<rect class="coin" x="504" y="228" width="168" height="26" rx="13"/>
+<rect class="coin" x="504" y="260" width="168" height="26" rx="13"/>
+<text class="name" x="48" y="214">طلبية</text>
+<text class="tag" x="48" y="250">قائمة مشترياتك وميزانيتها في مكان واحد</text>
+</svg>
+</body></html>

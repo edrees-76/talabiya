@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Talabiya"
+dynamic = ["version"]
+description = "طلبية: منظومة مشتريات المطاعم اليومية والعهدة النقدية"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{name = "Edrees F. Hery"}]
+dependencies = ["PySide6>=6.8,<7"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pytest-qt>=4.4,<5", "pytest-cov>=6,<8", "ruff>=0.14,<1", "mypy>=1.15,<2", "openpyxl>=3.1,<4"]
+build = ["pyinstaller>=6,<7"]
+
+[project.scripts]
+talabiya = "talabiya.gui.app:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "talabiya.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["talabiya*"]
+
+[tool.setuptools.package-data]
+talabiya = ["gui/assets/*", "gui/assets/fonts/*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["talabiya/core"]
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+qt_api = "pyside6"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["talabiya"]
+branch = true

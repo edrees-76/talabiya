@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build_exe/dist/
+build_exe/work/
+build_exe/*.spec
+installer/Output/
+*.db
+.claude/
+Gemini_Generated_Image_*.jfif

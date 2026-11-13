@@ -1,0 +1,66 @@
+/* طلبية — generated from tokens.json */
+:root, [data-theme="light"] {
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-tint: #f3f7fc;
+  --surface-fresh: #eaf6e7;
+  --surface-alert: #fdecea;
+  --surface-gold: #fff3cf;
+  --ink: #0a2a55;
+  --ink-muted: #44566f;
+  --brand: #063b78;
+  --on-brand: #ffffff;
+  --green: #3b9c2e;
+  --green-strong: #1f7a1c;
+  --on-green-strong: #ffffff;
+  --gold: #feb605;
+  --on-gold: #0a2a55;
+  --tomato: #dc2925;
+  --danger: #b3201c;
+  --on-danger: #ffffff;
+  --divider: #d5dfec;
+  --control-border: #6b7f9c;
+  --focus: var(--brand);
+  --shadow-card: 0 1px 2px rgba(10,42,85,0.08), 0 6px 18px rgba(10,42,85,0.08);
+}
+[data-theme="dark"] {
+  --surface: #0a1830;
+  --surface-raised: #11264a;
+  --surface-tint: #0e2040;
+  --surface-fresh: #12301a;
+  --surface-alert: #3a1a1d;
+  --surface-gold: #3a2e0c;
+  --ink: #eef3fb;
+  --ink-muted: #a9b9d1;
+  --brand: #8fb8f0;
+  --on-brand: #07204a;
+  --green: #5fc455;
+  --green-strong: #6fd062;
+  --on-green-strong: #06210a;
+  --gold: #feb605;
+  --on-gold: #0a2a55;
+  --tomato: #ff6b64;
+  --danger: #ff8f8a;
+  --on-danger: #3a0705;
+  --divider: #1f3a64;
+  --control-border: #5f7798;
+  --focus: var(--brand);
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.45), 0 6px 18px rgba(0,0,0,0.35);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --font-display: "Cairo", "Tajawal", system-ui, sans-serif;
+  --font-body: "Tajawal", "Cairo", system-ui, sans-serif;
+  --font-latin: "Montserrat", "Cairo", system-ui, sans-serif;
+}

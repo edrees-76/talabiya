@@ -1,0 +1,448 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>طلبية — نموذج أولي</title>
+<link rel="stylesheet" href="../talabiya-brand/tokens.css">
+<link rel="stylesheet" href="../talabiya-brand/components/bundle.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--surface-tint);color:var(--ink);font:400 15px/1.6 var(--font-body)}
+button{font-family:inherit}
+.num{font-family:var(--font-latin);font-weight:700;direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* proto bar */
+.proto{position:fixed;inset-inline:0;bottom:0;z-index:50;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 16px;background:#1b2433;color:#fff;font:500 13px var(--font-body)}
+.proto b{margin-inline-end:8px}
+.proto button{background:#2d3a50;color:#fff;border:0;border-radius:8px;padding:6px 10px;cursor:pointer}
+.proto button.on{background:var(--gold);color:var(--on-gold)}
+
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;padding:16px 16px 80px}
+.login-card{width:min(420px,100%);background:var(--surface-raised);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:32px;display:flex;flex-direction:column;gap:16px}
+.login-card .logo{background:#fff;border-radius:var(--radius-lg);padding:8px;display:flex;justify-content:center}
+.login-card img{width:180px}
+.login-card h1{margin:0;font:800 22px var(--font-display);text-align:center}
+.linkbtn{background:none;border:0;color:var(--brand);font:700 14px var(--font-body);cursor:pointer;text-decoration:underline;align-self:center}
+
+/* shell */
+#app{display:none;min-height:100vh;grid-template-columns:248px 1fr;padding-bottom:52px}
+.side{background:var(--surface-raised);border-inline-start:0;border-inline-end:1px solid var(--divider);padding:16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.side .brand{background:#fff;border-radius:var(--radius-md);padding:6px;margin-bottom:12px}
+.side .brand img{width:100%;display:block}
+.nav{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:var(--radius-md);border:0;background:none;color:var(--ink);font:700 15px var(--font-body);cursor:pointer;text-align:start}
+.nav:hover{background:var(--surface-tint)}
+.nav.on{background:var(--brand);color:var(--on-brand)}
+.side .foot{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+main{padding:24px 32px;min-width:0}
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.top h2{margin:0;font:800 26px var(--font-display);color:var(--brand)}
+.top .sub{color:var(--ink-muted);font-weight:500}
+.top .spacer{flex:1}
+.datepill{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--control-border);border-radius:var(--radius-md);padding:0 12px;min-height:44px;background:var(--surface-raised);font-weight:700}
+.datepill input{border:0;background:none;color:var(--ink);font:700 15px var(--font-latin)}
+
+.card{background:var(--surface-raised);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:20px}
+.card h3{margin:0 0 12px;font:700 18px var(--font-display);display:flex;align-items:center;gap:8px}
+.card h3 small{margin-inline-start:auto;font:500 13px var(--font-body);color:var(--ink-muted)}
+.grid{display:grid;gap:20px}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi{display:flex;flex-direction:column;gap:4px}
+.kpi .lbl{display:flex;align-items:center;gap:8px;color:var(--ink-muted);font-weight:700;font-size:14px}
+.kpi .lbl span.ic{width:36px;height:36px;border-radius:var(--radius-sm);display:grid;place-items:center;background:var(--surface-tint);color:var(--brand)}
+.kpi .val{font:700 28px/1.2 var(--font-latin);direction:ltr;text-align:end}
+.kpi .val small{font:700 14px var(--font-body);color:var(--ink-muted)}
+.kpi .hint{font-size:13px;color:var(--ink-muted)}
+.kpi.gold .lbl span.ic{background:var(--surface-gold);color:var(--on-gold)}
+.two{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+
+/* restaurant status */
+.rest-list{display:flex;flex-direction:column}
+.rest-row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:12px 0;border-bottom:1px solid var(--divider);cursor:pointer}
+.rest-row:last-child{border-bottom:0}
+.rest-row .nm{font-weight:700;font-size:16px}
+.bar{grid-column:1/-1;height:10px;border-radius:var(--radius-pill);background:var(--surface-tint);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:var(--radius-pill)}
+.rest-row .meta{grid-column:1/-1;display:flex;gap:16px;font-size:13px;color:var(--ink-muted)}
+.rest-row .meta b{color:var(--ink)}
+
+/* chart */
+.chart{display:flex;align-items:flex-end;gap:12px;height:200px;padding-top:12px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.chart .col i{width:100%;max-width:48px;background:var(--brand);border-radius:8px 8px 4px 4px}
+.chart .col.today i{background:var(--green)}
+.chart .col span{font-size:12px;color:var(--ink-muted);font-weight:700}
+.chart .col em{font:700 12px var(--font-latin);font-style:normal}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--ink-muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:6px;vertical-align:middle}
+
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font:700 13px var(--font-body);color:var(--ink-muted);text-align:start;padding:8px;border-bottom:2px solid var(--divider)}
+.tbl td{padding:10px 8px;border-bottom:1px solid var(--divider)}
+.tbl td.n,.tbl th.n{text-align:end}
+.tbl tr:last-child td{border-bottom:0}
+.up{color:var(--danger);font-weight:700;display:inline-flex;align-items:center;gap:4px}
+.down{color:var(--green-strong);font-weight:700;display:inline-flex;align-items:center;gap:4px}
+.alerts{display:flex;flex-direction:column;gap:8px}
+.alert{display:flex;gap:12px;align-items:center;padding:12px;border-radius:var(--radius-md);font-weight:500}
+.alert.warn{background:var(--surface-gold)}
+.alert.bad{background:var(--surface-alert);color:var(--danger)}
+.alert.ok{background:var(--surface-fresh);color:var(--green-strong)}
+.alert .tl-btn{margin-inline-start:auto}
+
+/* empty */
+.empty{text-align:center;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.empty img{width:120px;background:#fff;border-radius:var(--radius-lg);padding:8px}
+.empty h3{justify-content:center;font-size:22px;margin:0}
+.empty p{margin:0;color:var(--ink-muted);max-width:460px}
+.steps{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.step{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--radius-pill);background:var(--surface-tint);font-weight:700;font-size:14px}
+.step b{width:24px;height:24px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;font:700 12px var(--font-latin)}
+
+/* day sheet */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tab{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:var(--radius-md);border:2px solid var(--control-border);background:var(--surface-raised);color:var(--ink);font:700 15px var(--font-body);cursor:pointer}
+.tab.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.tab .dot{font:700 12px var(--font-latin);padding:2px 8px;border-radius:var(--radius-pill);background:var(--surface-tint);color:var(--ink)}
+.sheet{grid-template-columns:minmax(0,1fr) 320px;align-items:start}
+.lines{width:100%;min-width:720px;border-collapse:collapse}
+.lines input.n{min-width:84px}.lines select{min-width:104px;padding:0 6px}
+.lines th{font:700 13px var(--font-body);color:var(--ink-muted);text-align:start;padding:8px 6px;border-bottom:2px solid var(--divider);white-space:nowrap}
+.lines td{padding:6px;border-bottom:1px solid var(--divider);vertical-align:middle}
+.lines input,.lines select,.side-form input,.side-form select,.modal input,.modal select{width:100%;min-height:40px;padding:0 10px;border:2px solid var(--control-border);border-radius:10px;background:var(--surface-raised);color:var(--ink);font:500 15px var(--font-body)}
+.lines input.n{font-family:var(--font-latin);font-weight:700;text-align:end;direction:ltr}
+.lines input:focus-visible,.lines select:focus-visible,.side-form input:focus-visible,.modal input:focus-visible,.modal select:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-color:var(--brand)}
+.lines .seq{font:700 13px var(--font-latin);color:var(--ink-muted);text-align:center;width:32px}
+.lines .tot{font:700 15px var(--font-latin);text-align:end;direction:ltr;white-space:nowrap}
+.icbtn{width:40px;height:40px;border-radius:10px;border:0;background:none;color:var(--ink-muted);display:grid;place-items:center;cursor:pointer}
+.icbtn:hover{background:var(--surface-alert);color:var(--danger)}
+.addrow{margin-top:12px}
+.summary{display:flex;flex-direction:column;gap:12px;position:sticky;top:16px}
+.side-form{display:flex;flex-direction:column;gap:12px}
+.side-form label{font:700 14px var(--font-body);display:flex;flex-direction:column;gap:6px}
+.side-form input{font-family:var(--font-latin);font-weight:700;direction:ltr;text-align:end}
+.sumline{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--divider)}
+.sumline:last-child{border-bottom:0}
+.sumline span{color:var(--ink-muted);font-weight:700}
+.remain{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:var(--radius-md);background:var(--surface-tint)}
+.remain strong{font:700 30px var(--font-latin);color:var(--brand);text-align:end}
+.remain.neg{background:var(--surface-alert)} .remain.neg strong{color:var(--danger)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* close */
+.close-grid{grid-template-columns:minmax(0,1fr) 380px;align-items:start}
+.bigdiff{padding:20px;border-radius:var(--radius-lg);display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.bigdiff strong{font:700 36px var(--font-latin)}
+.bigdiff.ok{background:var(--surface-fresh);color:var(--green-strong)}
+.bigdiff.bad{background:var(--surface-alert);color:var(--danger)}
+.bigdiff.more{background:var(--surface-gold);color:var(--ink)}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(10,24,48,.45);display:none;place-items:center;z-index:40;padding:16px}
+.modal{background:var(--surface-raised);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:24px;width:min(440px,100%);display:flex;flex-direction:column;gap:14px}
+.modal h3{margin:0;font:800 20px var(--font-display)}
+.modal label{font:700 14px var(--font-body);display:flex;flex-direction:column;gap:6px}
+
+.screen{display:none}
+.screen.on{display:block}
+.muted{color:var(--ink-muted)}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two,.sheet,.close-grid{grid-template-columns:1fr}.summary{position:static}}
+@media (max-width:760px){#app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap}.side .brand,.side .foot{display:none}main{padding:16px}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9l1.5-5h13L20 9M4 9h16v2a3 3 0 0 1-5.3 2 3 3 0 0 1-5.4 0A3 3 0 0 1 4 11zM5 13v7h14v-7M10 20v-4h4v4"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="6" rx="6" ry="2.5"/><path d="M3 6v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6M3 10v4c0 1.4 2.7 2.5 6 2.5"/><ellipse cx="15" cy="14" rx="6" ry="2.5"/><path d="M9 14v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1V7zm0 0V6a2 2 0 0 1 2-2h10v3"/><circle cx="16" cy="13.5" r="1.2"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M9 14l-5-5 5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l4 4 10-10"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8V3M7 21v-7h10v7"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l-5-5 5-5M5 12h11"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></symbol>
+</svg>
+
+<!-- LOGIN -->
+<section id="login">
+  <div class="login-card">
+    <div class="logo"><img src="../talabiya-brand/assets/Logos/logo-stacked.jpg" alt="طلبية"></div>
+    <h1>تسجيل الدخول</h1>
+    <div class="tl-field"><label for="pin">كلمة السر</label><input id="pin" type="password" placeholder="أدخل كلمة السر" value="1234"></div>
+    <button class="tl-btn tl-btn--primary" onclick="enter()"><svg class="i"><use href="#i-lock"/></svg>دخول</button>
+    <button class="linkbtn" onclick="openModal('recover')">نسيت كلمة السر؟</button>
+  </div>
+</section>
+
+<!-- APP -->
+<div id="app">
+  <aside class="side">
+    <div class="brand"><img src="../talabiya-brand/assets/Logos/logo-horizontal.jpg" alt="طلبية"></div>
+    <button class="nav on" data-go="dash"><svg class="i"><use href="#i-home"/></svg>لوحة القيادة</button>
+    <button class="nav" data-go="day"><svg class="i"><use href="#i-cart"/></svg>مشتريات اليوم</button>
+    <button class="nav" data-go="close"><svg class="i"><use href="#i-scale"/></svg>إقفال اليوم</button>
+    <button class="nav" data-go="history"><svg class="i"><use href="#i-clock"/></svg>السجل</button>
+    <button class="nav" data-go="rests"><svg class="i"><use href="#i-store"/></svg>المطاعم</button>
+    <button class="nav" data-go="items"><svg class="i"><use href="#i-list"/></svg>الأصناف والوحدات</button>
+    <button class="nav" data-go="settings"><svg class="i"><use href="#i-gear"/></svg>الإعدادات</button>
+    <div class="foot">
+      <button class="nav" onclick="toggleTheme()"><svg class="i"><use href="#i-moon"/></svg>الوضع الداكن</button>
+      <button class="nav" onclick="logout()"><svg class="i"><use href="#i-out"/></svg>خروج</button>
+    </div>
+  </aside>
+  <main>
+    <!-- DASHBOARD -->
+    <section class="screen on" id="s-dash"></section>
+    <!-- DAY -->
+    <section class="screen" id="s-day"></section>
+    <!-- CLOSE -->
+    <section class="screen" id="s-close"></section>
+    <!-- HISTORY -->
+    <section class="screen" id="s-history"></section>
+    <!-- RESTAURANTS -->
+    <section class="screen" id="s-rests"></section>
+    <!-- ITEMS -->
+    <section class="screen" id="s-items"></section>
+    <!-- SETTINGS -->
+    <section class="screen" id="s-settings"></section>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-bg" id="m-rest"><div class="modal">
+  <h3>إضافة مطعم</h3>
+  <label>اسم المطعم<input id="newRest" placeholder="مثال: مطعم العاصمة"></label>
+  <label>ملاحظة (اختياري)<input placeholder="الفرع أو العنوان"></label>
+  <div class="actions"><button class="tl-btn tl-btn--fresh" onclick="addRest()"><svg class="i"><use href="#i-plus"/></svg>إضافة</button><button class="tl-btn tl-btn--outline" onclick="closeModal()">إلغاء</button></div>
+</div></div>
+<div class="modal-bg" id="m-recover"><div class="modal">
+  <h3>استرجاع كلمة السر</h3>
+  <p class="muted" style="margin:0">السؤال السري: ما اسم أول مدرسة درست فيها؟</p>
+  <label>الإجابة<input placeholder="اكتب الإجابة"></label>
+  <label>كلمة سر جديدة<input type="password"></label>
+  <div class="actions"><button class="tl-btn tl-btn--primary" onclick="closeModal()">حفظ كلمة السر</button><button class="tl-btn tl-btn--outline" onclick="closeModal()">إلغاء</button></div>
+</div></div>
+
+<div class="proto">
+  <b>نموذج أولي</b>
+  <button id="pData" class="on" onclick="setMode('data')">ببيانات تجريبية</button>
+  <button id="pEmpty" onclick="setMode('empty')">أول تشغيل (بلا مطاعم)</button>
+  <span class="muted" style="color:#aab">البيانات وهمية ولا تُحفظ</span>
+</div>
+
+<script>
+const fmt=v=>(Math.round(v*1000)/1000).toLocaleString('en-US',{minimumFractionDigits:3,maximumFractionDigits:3});
+const money=v=>`<span class="num">${fmt(v)}</span> د.ل`;
+const ic=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
+const TODAY='2026-11-13';
+const UNITS=['كجم','جرام','قابية','استيكة','صندوق','شوال','حكية','كيس','لفة','باكو','قطعة','رزمة','شك','طرف','لتر'];
+const ITEMS=['سلاطة','طماطم','هريسة','فلفل حلو','فلفل حار','بصل حويل','ليم','كسبر','جزر','زيت عباد الشمس','مقسم وجبات','ورق شاورما','علب هريسة 20×20','حليب','ملاعق','جبنة شرائح','زيتون اسود شرائح','ارز','قزير','جبنة موزريلا','جبنة شيدر','شكاير زبون سوداء','شكاير كناسة','مناديل','دقيق','المزيل الشامل','خل','لبن','سمن','تن','خميرة','فوم 1 كجم','اسفنجة غسيل','ليفة حديد'];
+
+const DEMO=()=>({
+  rests:[
+    {id:1,name:'كازابلانكا - ازواوة'},
+    {id:2,name:'كازابلانكا - حي السلام'},
+    {id:3,name:'مطعم العاصمة'},
+    {id:4,name:'مطعم مذاقى'},
+  ],
+  sheets:{
+    1:{received:600,wage:50,fee:3,lines:[['سلاطة',4,'قابية',30],['طماطم',8,'كجم',3.5],['هريسة',6,'كجم',7],['ليم',2,'كجم',5],['زيت عباد الشمس',1,'صندوق',150],['شكاير زبون سوداء',3,'استيكة',15]]},
+    2:{received:0,wage:0,fee:0,lines:[]},
+    3:{received:3100,wage:50,fee:1,lines:[['سلاطة',5,'قابية',30],['كسبر',1,'شك',3],['فلفل حلو',2,'كجم',5],['هريسة',10,'كجم',7],['طماطم',10,'كجم',3.5],['زيت عباد الشمس',3,'صندوق',150],['مقسم وجبات',3,'صندوق',90],['جبنة شرائح',2,'صندوق',160],['ارز',2,'شوال',140],['قزير',2,'قطعة',83],['جبنة موزريلا',2,'قطعة',92.5],['دقيق',1,'شوال',205],['مناديل',3,'كيس',24]]},
+    4:{received:300,wage:50,fee:2,lines:[['سلاطة',3,'قابية',30],['فلفل حلو',2,'كجم',5],['هريسة',5,'كجم',7],['فلفل حار',2,'كجم',5],['شكاير زبون سوداء',2,'استيكة',15],['كسبر',1,'كجم',18]]},
+  },
+  actual:null,
+});
+let S=DEMO(), cur=1, mode='data';
+
+const lineTotal=l=>l[1]*l[3];
+const spent=s=>s.lines.reduce((a,l)=>a+lineTotal(l),0)+(+s.wage||0)+(+s.fee||0);
+const remain=s=>(+s.received||0)-spent(s);
+const status=s=>!s.received&&!s.lines.length?'none':(s.closed?'done':'busy');
+const BADGE={none:`<span class="tl-badge tl-badge--new">${ic('pause')}لم يبدأ</span>`,busy:`<span class="tl-badge tl-badge--pending">${ic('clock')}قيد الشراء</span>`,done:`<span class="tl-badge tl-badge--done">${ic('check')}مكتمل</span>`};
+const totals=()=>{let r=0,sp=0,rm=0;S.rests.forEach(x=>{const s=S.sheets[x.id];r+=+s.received||0;sp+=spent(s);rm+=remain(s)});return{r,sp,rm}};
+const topBar=(t,sub,extra='')=>`<div class="top"><div><h2>${t}</h2><div class="sub">${sub}</div></div><span class="spacer"></span>${extra}</div>`;
+const datePill=`<label class="datepill">${ic('clock')}الخميس <input type="date" value="${TODAY}"></label>`;
+
+function emptyState(){return `<div class="card empty"><img src="../talabiya-brand/assets/Logos/mark-clipboard.png" alt=""><h3>ابدأ بإضافة أول مطعم</h3><p>المنظومة فارغة. أضف المطاعم التي تشتري لها، ثم سجّل مشتريات كل يوم وأقفل اليوم بمقارنة الراجع بالموجود.</p><div class="steps"><span class="step"><b>1</b>أضف المطاعم</span><span class="step"><b>2</b>راجع الأصناف</span><span class="step"><b>3</b>سجّل مشتريات اليوم</span><span class="step"><b>4</b>أقفل اليوم</span></div><button class="tl-btn tl-btn--fresh" onclick="openModal('rest')">${ic('plus')}إضافة مطعم</button></div>`}
+
+function renderDash(){
+  const el=document.getElementById('s-dash');
+  if(!S.rests.length){el.innerHTML=topBar('لوحة القيادة','مرحباً إدريس',datePill)+emptyState();return}
+  const t=totals();
+  const week=[['السبت',3120],['الأحد',2840],['الاثنين',3510],['الثلاثاء',2960],['الأربعاء',3305],['الخميس',t.sp]];
+  const mx=Math.max(...week.map(w=>w[1]));
+  const per=S.rests.map(x=>({x,s:S.sheets[x.id]}));
+  const monthShare=[['مطعم العاصمة',41250],['كازابلانكا - ازواوة',18760],['مطعم مذاقى',9420],['كازابلانكا - حي السلام',12380]];
+  const msum=monthShare.reduce((a,b)=>a+b[1],0);
+  const colors=['var(--brand)','var(--green)','var(--gold)','var(--control-border)'];
+  el.innerHTML=topBar('لوحة القيادة','ملخص اليوم والأسبوع',datePill+`<button class="tl-btn tl-btn--primary" onclick="go('day')">${ic('cart')}مشتريات اليوم</button>`)+`
+  <div class="grid kpis">
+    <div class="card kpi"><div class="lbl"><span class="ic">${ic('wallet')}</span>المستلم اليوم</div><div class="val">${fmt(t.r)} <small>د.ل</small></div><div class="hint">من ${per.filter(p=>p.s.received).length} مطاعم</div></div>
+    <div class="card kpi"><div class="lbl"><span class="ic">${ic('cart')}</span>المصروفات اليوم</div><div class="val">${fmt(t.sp)} <small>د.ل</small></div><div class="hint">${per.reduce((a,p)=>a+p.s.lines.length,0)} صنفاً مشترى</div></div>
+    <div class="card kpi gold"><div class="lbl"><span class="ic">${ic('return')}</span>الراجع المتوقع</div><div class="val">${fmt(t.rm)} <small>د.ل</small></div><div class="hint">المستلم − المصروفات</div></div>
+    <div class="card kpi"><div class="lbl"><span class="ic">${ic('scale')}</span>الفرق</div><div class="val" style="font-size:20px">${S.actual==null?'<span class="tl-badge tl-badge--pending">'+ic('clock')+'اليوم لم يُقفل</span>':diffBadge(S.actual-t.rm)}</div><div class="hint">يُحسب عند إقفال اليوم</div></div>
+  </div>
+  <div class="grid two" style="margin-top:20px">
+    <div class="card"><h3>${ic('store')}حالة المطاعم اليوم<small>اضغط على المطعم لفتح مشترياته</small></h3><div class="rest-list">
+      ${per.map(({x,s})=>{const p=s.received?Math.min(100,spent(s)/s.received*100):0;return `<div class="rest-row" onclick="cur=${x.id};go('day')"><span class="nm">${x.name}</span>${BADGE[status(s)]}<div class="bar"><i style="width:${p}%;${p>=100?'background:var(--danger)':''}"></i></div><div class="meta"><span>المستلم <b>${money(+s.received||0)}</b></span><span>المصروف <b>${money(spent(s))}</b></span><span>المتبقي <b>${money(remain(s))}</b></span></div></div>`}).join('')}
+    </div></div>
+    <div class="card"><h3>${ic('alert')}تنبيهات</h3><div class="alerts">
+      <div class="alert warn">${ic('pause')}<span>كازابلانكا - حي السلام: لم يُسجَّل مستلم اليوم</span></div>
+      <div class="alert warn">${ic('clock')}<span>يوم الأربعاء 12-11 لم يُقفل بعد</span><button class="tl-btn tl-btn--outline tl-btn--sm" onclick="go('close')">إقفال</button></div>
+      <div class="alert bad">${ic('up')}<span>جبنة موزريلا ارتفعت 12% عن آخر شراء</span></div>
+      <div class="alert ok">${ic('check')}<span>آخر نسخة احتياطية: اليوم 08:15</span></div>
+    </div></div>
+  </div>
+  <div class="grid two" style="margin-top:20px">
+    <div class="card"><h3>${ic('cart')}المصروفات — آخر 6 أيام<small>كل المطاعم</small></h3>
+      <div class="chart">${week.map((w,i)=>`<div class="col ${i==week.length-1?'today':''}"><em class="num">${Math.round(w[1])}</em><i style="height:${w[1]/mx*150}px"></i><span>${w[0]}</span></div>`).join('')}</div>
+      <div class="legend"><span><i style="background:var(--brand)"></i>أيام سابقة</span><span><i style="background:var(--green)"></i>اليوم</span></div>
+    </div>
+    <div class="card"><h3>${ic('store')}توزيع مصروفات الشهر<small>نوفمبر 2026</small></h3>
+      <div style="display:flex;height:18px;border-radius:999px;overflow:hidden;margin:8px 0 16px">${monthShare.map((m,i)=>`<i style="width:${m[1]/msum*100}%;background:${colors[i]}"></i>`).join('')}</div>
+      <table class="tbl">${monthShare.map((m,i)=>`<tr><td><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${colors[i]};margin-inline-end:8px"></i>${m[0]}</td><td class="n">${money(m[1])}</td><td class="n muted num">${Math.round(m[1]/msum*100)}%</td></tr>`).join('')}
+      <tr><td><b>المجموع</b></td><td class="n"><b>${money(msum)}</b></td><td></td></tr></table>
+    </div>
+  </div>
+  <div class="grid two" style="margin-top:20px">
+    <div class="card"><h3>${ic('list')}أعلى الأصناف تكلفة هذا الشهر</h3><table class="tbl"><tr><th>الصنف</th><th class="n">الكمية</th><th class="n">المجموع</th></tr>
+      ${[['زيت عباد الشمس','42 صندوق',6300],['جبنة شرائح','28 صندوق',4480],['ارز','26 شوال',3640],['دقيق','14 شوال',2870],['مقسم وجبات','30 صندوق',2700]].map(r=>`<tr><td>${r[0]}</td><td class="n muted">${r[1]}</td><td class="n">${money(r[2])}</td></tr>`).join('')}</table></div>
+    <div class="card"><h3>${ic('coins')}متابعة الأسعار<small>آخر سعر مقابل السابق</small></h3><table class="tbl"><tr><th>الصنف</th><th class="n">السابق</th><th class="n">الأخير</th><th class="n">التغير</th></tr>
+      ${[['جبنة موزريلا',82.5,92.5],['طماطم',4,3.5],['زيت عباد الشمس',145,150],['هريسة',7,7],['سلاطة',32,30]].map(r=>{const d=(r[2]-r[1])/r[1]*100;return `<tr><td>${r[0]}</td><td class="n num">${fmt(r[1])}</td><td class="n num">${fmt(r[2])}</td><td class="n">${d>0?`<span class="up">${ic('up')}<span class="num">${d.toFixed(0)}%</span> ارتفاع</span>`:d<0?`<span class="down">${ic('down')}<span class="num">${(-d).toFixed(0)}%</span> انخفاض</span>`:'<span class="muted">ثابت</span>'}</td></tr>`}).join('')}</table></div>
+  </div>`;
+}
+function diffBadge(d){if(Math.abs(d)<.0005)return `<span class="tl-badge tl-badge--done">${ic('check')}مطابق</span>`;return d<0?`<span class="tl-badge tl-badge--cancel">${ic('alert')}عجز <span class="num">${fmt(-d)}</span></span>`:`<span class="tl-badge tl-badge--pending">${ic('up')}زيادة <span class="num">${fmt(d)}</span></span>`}
+
+function renderDay(){
+  const el=document.getElementById('s-day');
+  if(!S.rests.length){el.innerHTML=topBar('مشتريات اليوم','',datePill)+emptyState();return}
+  if(!S.sheets[cur])cur=S.rests[0].id;
+  const s=S.sheets[cur], r=S.rests.find(x=>x.id==cur);
+  const opts=(arr,v)=>arr.map(a=>`<option ${a==v?'selected':''}>${a}</option>`).join('');
+  el.innerHTML=topBar('مشتريات اليوم','سجّل ما اشتريته لكل مطعم',datePill)+`
+  <div class="tabs">${S.rests.map(x=>`<button class="tab ${x.id==cur?'on':''}" onclick="cur=${x.id};renderDay()">${x.name}<span class="dot">${S.sheets[x.id].lines.length}</span></button>`).join('')}</div>
+  <div class="grid sheet">
+    <div class="card"><h3>${ic('cart')}${r.name}<small>${BADGE[status(s)]}</small></h3>
+      <div style="overflow-x:auto"><table class="lines"><thead><tr><th>#</th><th style="min-width:170px">البيان</th><th style="width:90px">الكمية</th><th style="width:110px">الوحدة</th><th style="width:110px">سعر الوحدة</th><th style="width:110px;text-align:end">الإجمالي</th><th></th></tr></thead><tbody>
+      ${s.lines.map((l,i)=>`<tr><td class="seq">${i+1}</td><td><input list="itemsList" value="${l[0]}" onchange="upd(${i},0,this.value)"></td><td><input class="n" type="number" step="0.25" value="${l[1]}" oninput="upd(${i},1,this.value)"></td><td><select onchange="upd(${i},2,this.value)">${opts(UNITS,l[2])}</select></td><td><input class="n" type="number" step="0.5" value="${l[3]}" oninput="upd(${i},3,this.value)"></td><td class="tot" id="t${i}">${fmt(lineTotal(l))}</td><td><button class="icbtn" title="حذف" onclick="delLine(${i})">${ic('trash')}</button></td></tr>`).join('')}
+      ${!s.lines.length?'<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">لا توجد بنود بعد. اضغط «أضف صنفاً».</td></tr>':''}
+      </tbody></table></div>
+      <datalist id="itemsList">${ITEMS.map(i=>`<option value="${i}">`).join('')}</datalist>
+      <button class="tl-btn tl-btn--fresh addrow" onclick="addLine()">${ic('plus')}أضف صنفاً</button>
+    </div>
+    <div class="summary">
+      <div class="card side-form">
+        <label>المبلغ المستلم<input type="number" value="${s.received||''}" placeholder="0.000" oninput="S.sheets[cur].received=+this.value;refreshSum()"></label>
+        <label>يومية ادريس<input type="number" value="${s.wage||''}" placeholder="0.000" oninput="S.sheets[cur].wage=+this.value;refreshSum()"></label>
+        <label>رسم دخول + تحميل<input type="number" value="${s.fee||''}" placeholder="0.000" oninput="S.sheets[cur].fee=+this.value;refreshSum()"></label>
+      </div>
+      <div class="card" id="sumBox"></div>
+      <div class="actions"><button class="tl-btn tl-btn--primary" onclick="S.sheets[cur].closed=true;renderDay()">${ic('save')}حفظ</button><button class="tl-btn tl-btn--outline" onclick="window.print()">${ic('print')}طباعة</button></div>
+    </div>
+  </div>`;
+  refreshSum();
+}
+function refreshSum(){
+  const s=S.sheets[cur]; s.lines.forEach((l,i)=>{const t=document.getElementById('t'+i);if(t)t.textContent=fmt(lineTotal(l))});
+  const p=s.lines.reduce((a,l)=>a+lineTotal(l),0), rm=remain(s);
+  document.getElementById('sumBox').innerHTML=`
+    <div class="sumline"><span>المشتريات (${s.lines.length} صنف)</span>${money(p)}</div>
+    <div class="sumline"><span>يومية + رسوم</span>${money((+s.wage||0)+(+s.fee||0))}</div>
+    <div class="sumline"><span>إجمالي المصروفات</span><b>${money(spent(s))}</b></div>
+    <div class="remain ${rm<0?'neg':''}" style="margin-top:8px"><span style="font-weight:700">${rm<0?ic('alert')+' المصروف أكبر من المستلم':'المتبقي'}</span><strong>${money(rm)}</strong></div>`;
+}
+function upd(i,k,v){const l=S.sheets[cur].lines[i];l[k]=k==1||k==3?(+v||0):v;refreshSum()}
+function addLine(){S.sheets[cur].lines.push(['',1,'كجم',0]);renderDay();const ins=document.querySelectorAll('.lines tbody tr:last-child input');ins[0]&&ins[0].focus()}
+function delLine(i){S.sheets[cur].lines.splice(i,1);renderDay()}
+
+function renderClose(){
+  const el=document.getElementById('s-close');
+  if(!S.rests.length){el.innerHTML=topBar('إقفال اليوم','',datePill)+emptyState();return}
+  const t=totals();
+  const d=S.actual==null?null:S.actual-t.rm;
+  el.innerHTML=topBar('إقفال اليوم','قارن الراجع من كل المطاعم بالمبلغ الموجود معك',datePill)+`
+  <div class="grid close-grid">
+    <div class="card"><h3>${ic('return')}الراجع من المطاعم</h3><table class="tbl"><tr><th>المطعم</th><th class="n">المستلم</th><th class="n">المصروفات</th><th class="n">المتبقي</th><th>الحالة</th></tr>
+      ${S.rests.map(x=>{const s=S.sheets[x.id];return `<tr><td>${x.name}</td><td class="n num">${fmt(+s.received||0)}</td><td class="n num">${fmt(spent(s))}</td><td class="n num">${fmt(remain(s))}</td><td>${BADGE[status(s)]}</td></tr>`}).join('')}
+      <tr style="background:var(--surface-tint)"><td><b>الإجمالي</b></td><td class="n num">${fmt(t.r)}</td><td class="n num">${fmt(t.sp)}</td><td class="n"><span class="tl-badge" style="background:var(--gold);color:var(--on-gold)"><span class="num">${fmt(t.rm)}</span> د.ل</span></td><td></td></tr></table></div>
+    <div class="summary">
+      <div class="card side-form"><label>المبلغ الموجود فعلياً<input type="number" placeholder="0.000" value="${S.actual??''}" oninput="S.actual=this.value===''?null:+this.value;renderCloseDiff()"></label><label>ملاحظات<input style="text-align:start;font-family:var(--font-body);direction:rtl" placeholder="سبب الفرق إن وجد"></label></div>
+      <div id="diffBox"></div>
+      <div class="actions"><button class="tl-btn tl-btn--primary">${ic('lock')}إقفال اليوم</button><button class="tl-btn tl-btn--outline" onclick="window.print()">${ic('print')}طباعة الملخص</button></div>
+    </div>
+  </div>`;
+  renderCloseDiff();
+}
+function renderCloseDiff(){
+  const t=totals(), b=document.getElementById('diffBox'); if(!b)return;
+  if(S.actual==null){b.innerHTML=`<div class="bigdiff more">${ic('clock')}<span>أدخل المبلغ الموجود لحساب الفرق</span></div>`;return}
+  const d=S.actual-t.rm;
+  b.innerHTML=Math.abs(d)<.0005?`<div class="bigdiff ok"><span>${ic('check')} مطابق — لا يوجد فرق</span><strong>0.000</strong></div>`
+   :d<0?`<div class="bigdiff bad"><span>${ic('alert')} عجز</span><strong>${money(-d)}</strong></div>`
+   :`<div class="bigdiff more"><span>${ic('up')} زيادة</span><strong>${money(d)}</strong></div>`;
+}
+
+function renderHistory(){
+  const rows=[['2026-11-12','الأربعاء',4,7210.5,9100,'none'],['2026-11-11','الثلاثاء',4,2960,3200,-5],['2026-11-10','الاثنين',3,3510,4000,0],['2026-11-09','الأحد',4,2840,3000,2.5],['2026-11-08','السبت',4,3120,3500,0]];
+  document.getElementById('s-history').innerHTML=topBar('السجل','كل الأيام السابقة — افتح أي يوم لتعديله أو حذفه',`<label class="datepill">من <input type="date" value="2026-11-01"></label><label class="datepill">إلى <input type="date" value="${TODAY}"></label>`)+`
+  <div class="card"><table class="tbl"><tr><th>التاريخ</th><th>اليوم</th><th class="n">المطاعم</th><th class="n">المستلم</th><th class="n">المصروفات</th><th>الإقفال</th><th></th></tr>
+  ${S.rests.length?rows.map(r=>`<tr><td class="num">${r[0]}</td><td>${r[1]}</td><td class="n num">${r[2]}</td><td class="n num">${fmt(r[4])}</td><td class="n num">${fmt(r[3])}</td><td>${r[5]==='none'?`<span class="tl-badge tl-badge--pending">${ic('clock')}لم يُقفل</span>`:diffBadge(r[5])}</td><td><button class="tl-btn tl-btn--outline tl-btn--sm" onclick="go('day')">فتح</button></td></tr>`).join(''):'<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">لا توجد أيام مسجلة بعد</td></tr>'}
+  </table></div>`;
+}
+function renderRests(){
+  document.getElementById('s-rests').innerHTML=topBar('المطاعم','المطاعم التي تشتري لها',`<button class="tl-btn tl-btn--fresh" onclick="openModal('rest')">${ic('plus')}إضافة مطعم</button>`)+(S.rests.length?`
+  <div class="card"><table class="tbl"><tr><th>#</th><th>اسم المطعم</th><th>الحالة</th><th class="n">مشتريات الشهر</th><th></th></tr>
+  ${S.rests.map((x,i)=>`<tr><td class="num">${i+1}</td><td><b>${x.name}</b></td><td><span class="tl-badge tl-badge--done">${ic('check')}نشط</span></td><td class="n">${money([18760,12380,41250,9420][i]||0)}</td><td style="text-align:end"><button class="tl-btn tl-btn--outline tl-btn--sm">تعديل</button> <button class="tl-btn tl-btn--outline tl-btn--sm">${ic('pause')}إيقاف</button></td></tr>`).join('')}</table></div>`:emptyState());
+}
+function renderItems(){
+  document.getElementById('s-items').innerHTML=topBar('الأصناف والوحدات','قائمة مشتركة لكل المطاعم',`<button class="tl-btn tl-btn--fresh">${ic('plus')}صنف جديد</button>`)+`
+  <div class="grid two"><div class="card"><h3>${ic('list')}الأصناف<small><span class="num">${ITEMS.length}</span> صنف</small></h3><table class="tbl"><tr><th>الصنف</th><th>الوحدة الافتراضية</th><th></th></tr>
+  ${ITEMS.slice(0,12).map((n,i)=>`<tr><td>${n}</td><td class="muted">${UNITS[[2,0,0,0,0,0,0,12,0,4,4,3][i]]}</td><td style="text-align:end"><button class="tl-btn tl-btn--outline tl-btn--sm">تعديل</button></td></tr>`).join('')}</table></div>
+  <div class="card"><h3>${ic('scale')}الوحدات</h3><div style="display:flex;flex-wrap:wrap;gap:8px">${UNITS.map(u=>`<span class="tl-badge tl-badge--new">${u}</span>`).join('')}</div><button class="tl-btn tl-btn--outline tl-btn--sm" style="margin-top:16px">${ic('plus')}وحدة جديدة</button></div></div>`;
+}
+function renderSettings(){
+  document.getElementById('s-settings').innerHTML=topBar('الإعدادات','النسخ الاحتياطي وكلمة السر')+`
+  <div class="grid two"><div class="card side-form"><h3>${ic('save')}النسخ الاحتياطي</h3>
+    <label>التكرار<select><option>يومي</option><option selected>أسبوعي</option><option>شهري</option></select></label>
+    <label>مجلد النسخ<span style="display:flex;gap:8px"><input readonly value="D:\\نسخ طلبية" style="text-align:start;font-family:var(--font-body);direction:ltr"><button class="tl-btn tl-btn--outline tl-btn--sm">اختيار…</button></span></label>
+    <div class="alert ok">${ic('check')}<span>آخر نسخة: <span class="num">2026-11-13 08:15</span></span></div>
+    <div class="actions"><button class="tl-btn tl-btn--primary">${ic('save')}نسخ الآن</button><button class="tl-btn tl-btn--outline">استرجاع نسخة</button></div></div>
+  <div class="card side-form"><h3>${ic('lock')}كلمة السر</h3>
+    <label>كلمة السر الحالية<input type="password"></label><label>كلمة السر الجديدة<input type="password"></label>
+    <label>السؤال السري<input style="text-align:start;font-family:var(--font-body);direction:rtl" value="ما اسم أول مدرسة درست فيها؟"></label>
+    <button class="tl-btn tl-btn--primary">حفظ</button></div></div>`;
+}
+
+const R={dash:renderDash,day:renderDay,close:renderClose,history:renderHistory,rests:renderRests,items:renderItems,settings:renderSettings};
+function go(n){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id=='s-'+n));document.querySelectorAll('.nav[data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go==n));R[n]();window.scrollTo(0,0)}
+document.querySelectorAll('.nav[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+function enter(){document.getElementById('login').style.display='none';document.getElementById('app').style.display='grid';go('dash')}
+function logout(){document.getElementById('app').style.display='none';document.getElementById('login').style.display='grid'}
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme=='dark'?'light':'dark'}
+function openModal(n){document.getElementById('m-'+n).style.display='grid';const i=document.querySelector('#m-'+n+' input');i&&i.focus()}
+function closeModal(){document.querySelectorAll('.modal-bg').forEach(m=>m.style.display='none')}
+function addRest(){const v=document.getElementById('newRest').value.trim();if(!v)return;const id=Date.now();S.rests.push({id,name:v});S.sheets[id]={received:0,wage:0,fee:0,lines:[]};document.getElementById('newRest').value='';closeModal();go(document.querySelector('.nav.on')?.dataset.go||'dash')}
+function setMode(m){mode=m;S=m=='empty'?{rests:[],sheets:{},actual:null}:DEMO();cur=1;document.getElementById('pData').classList.toggle('on',m=='data');document.getElementById('pEmpty').classList.toggle('on',m=='empty');if(document.getElementById('app').style.display=='grid')go(document.querySelector('.nav.on')?.dataset.go||'dash')}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal()}));
+</script>
+</body>
+</html>
